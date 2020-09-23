@@ -1,40 +1,44 @@
 import { Injectable } from '@angular/core';
-import { Http, Response} from '@angular/http';
-import { Subject} from 'rxjs/Subject';
+import { Http, Response } from '@angular/http';
+import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/map';
+
 import { LogService } from './log.service';
 
 @Injectable()
 export class StarWarsService {
   private characters = [
-    { name: 'Luke Skywalker', side: 'light' },
-    { name: 'Darth Vader', side: 'dark' }
+    { name: 'Luke Skywalker', side: '' },
+    { name: 'Darth Vader', side: '' }
   ];
   private logService: LogService;
-  charactersChanged= new Subject<void>();
-  http:Http;
-  constructor(logService: LogService,http:Http) {
-    this.logService = logService;
-    this.http=http;
-  }
-  fetchCharacters(){
-     this.http.get('http://swapi.dev/api/people/')
-     .map((response: Response) => {
-       const data = response.json();
-       const extractedChars = data.results;
-       const chars = extractedChars.map((char) => {
-          return {name:char.name,side:''};
-       });
-        return chars;
-     })
+  charactersChanged = new Subject<void>();
+  http: Http;
 
-     .subscribe(
-       (data) => {
-         this.characters=data;
-         this.charactersChanged.next();
-       }
-     );
+  constructor(logService: LogService, http: Http) {
+    this.logService = logService;
+    this.http = http;
   }
+
+  fetchCharacters() {
+    this.http.get('http://swapi.co/api/people/')
+      .map((response: Response) => {
+        const data = response.json();
+        const extractedChars = data.results;
+        const chars = extractedChars.map((char) => {
+          return {name: char.name, side: ''};
+        });
+        return chars;
+      })
+      .subscribe(
+        (data) => {
+          console.log(data);
+          this.characters = data;
+          this.charactersChanged.next();
+        }
+      );
+  }
+
   getCharacters(chosenList) {
     if (chosenList === 'all') {
       return this.characters.slice();
